@@ -1,35 +1,46 @@
 import qrcode
-import PySimpleGUI as sg
 import tkinter as tk
+from tkinter import messagebox
 
-def executar_download(url):
+def executar_download():
+    url = entry_url.get()
+
+    if not url.strip():
+        messagebox.showerror("Erro", "Por favor, insira um link válido.")
+        return
+
     try:
         qr = qrcode.make(url)
         qr.save("qrcode.png")
 
-        print(f"Baixando qrcode")
-        print("Download concluido!")
+        messagebox.showinfo("Sucesso", "QR Code gerado com sucesso!")
     except Exception as e:
-        print(f"Erro ao realizar o download: {e}")
+        messagebox.showerror("Erro", f"Erro ao gerar QR Code:\n{e}")
 
 
-layout = [
-    [sg.Text("Link do site: "), sg.InputText(size=(40, 1), key='url')],
-    [sg.Button('Baixar'), sg.Button('Sair')],
-]
+# Criando janela
+janela = tk.Tk()
+janela.title("Gerador de QR Code")
+janela.geometry("400x150")
+janela.resizable(False, False)
 
-janela = sg.Window('Gerador de QrCode', layout)
+# Label
+label = tk.Label(janela, text="Link do site:")
+label.pack(pady=10)
 
-while True:
-    event, values = janela.read()
-    if event == sg.WINDOW_CLOSED or event == 'Sair':
-        break
-    elif event == 'Baixar':
-        url = values['url']
-        if url.strip():
-            executar_download(url)
-            sg.popup_ok("Download realizado com sucesso!")
-        else:
-            sg.popup_error("Por favor, insira um link valido.")
-        
-janela.close()
+# Input
+entry_url = tk.Entry(janela, width=50)
+entry_url.pack(pady=5)
+
+# Botões
+frame_botoes = tk.Frame(janela)
+frame_botoes.pack(pady=15)
+
+btn_download = tk.Button(frame_botoes, text="Baixar", command=executar_download)
+btn_download.grid(row=0, column=0, padx=10)
+
+btn_sair = tk.Button(frame_botoes, text="Sair", command=janela.quit)
+btn_sair.grid(row=0, column=1, padx=10)
+
+# Loop da aplicação
+janela.mainloop()
